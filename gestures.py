@@ -35,6 +35,12 @@ def recognize_gesture(lm_list):
     # Screenshot: index close to thumb AND middle up
     if distance(thumb, index) < 40 and middle_up:
         return "screenshot"
+    
+
+        # Fist: all fingers down (not up)
+    if not index_up and not middle_up and not ring_up and not pinky_up:
+        return "minimize"
+
 
     # Index up only
         # Index up only
