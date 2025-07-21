@@ -2,13 +2,13 @@ import cv2
 
 def draw_overlay(frame, gesture):
     overlays = {
-        "volume_up":    (" Volume Up", (0, 255, 0)), # Green
-        "play_pause":   (" Play/Pause", (0, 255, 255)), # Yellow
-        "mute":         (" Mute", (0, 0, 255)), # Red
-        "screenshot":   (" Screenshot", (255, 0, 0)), # Blue
-        "next_track":   (" Next Track", (128, 0, 128)),  # Purple
+        "volume_up":    (" Volume Up", (0, 255, 0)),
+        "play_pause":   (" Play/Pause", (0, 255, 255)),
+        "mute":         (" Mute", (0, 0, 255)),
+        "screenshot":   (" Screenshot", (255, 0, 0)),
+        "next_track":   (" Next Track", (128, 0, 128)),
         "previous_track":("Previous Track",(255,165,0)),
-        "minimize": (" Minimize", (100, 100, 255)),  # Light Blue
+        "minimize": (" Minimize", (100, 100, 255)),
     }
     if gesture in overlays:
         text, color = overlays[gesture]
