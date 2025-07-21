@@ -7,7 +7,6 @@ def recognize_gesture(lm_list):
     if len(lm_list) < 21:
         return None
 
-    # Extract landmarks
     thumb = lm_list[4]
     index = lm_list[8]
     middle = lm_list[12]
@@ -15,9 +14,8 @@ def recognize_gesture(lm_list):
     pinky = lm_list[20]
     wrist = lm_list[0]
 
-    # Finger up = tip is above MCP/PIP or far from wrist
     def is_up(tip, base):
-        return tip[1] < base[1] - 20  # more forgiving offset
+        return tip[1] < base[1] - 20
 
     index_up = is_up(index, lm_list[6])
     middle_up = is_up(middle, lm_list[10])
@@ -35,36 +33,30 @@ def recognize_gesture(lm_list):
     # Screenshot: index close to thumb AND middle up
     if distance(thumb, index) < 40 and middle_up:
         return "screenshot"
-    
 
-        # Fist: all fingers down (not up)
-    if not index_up and not middle_up and not ring_up and not pinky_up:
+    # Minimize: all fingers down AND close to wrist (closed fist)
+    fingers = [index, middle, ring, pinky]
+    if (not index_up and not middle_up and not ring_up and not pinky_up and
+        all(distance(f, wrist) < 50 for f in fingers)):
         return "minimize"
 
-
     # Index up only
-        # Index up only
-        # Index up only
     if index_up and not middle_up and not ring_up and not pinky_up:
         dx = index[0] - wrist[0]
-        dy = wrist[1] - index[1]  # flipped y-axis
+        dy = wrist[1] - index[1]
 
         if abs(dx) < 10:
             angle = 90
         else:
             angle = math.degrees(math.atan2(dy, dx))
 
-        # Debug print
         print("Angle:", angle)
 
-        # Right: near 0°, Left: near 180° or -180°, Up: near 90°
         if -40 < angle < 40:
             return "next_track"
         elif angle > 140 or angle < -140:
             return "previous_track"
-        else:
+        elif 60 < angle < 120:
             return "volume_up"
-
-
 
     return None
