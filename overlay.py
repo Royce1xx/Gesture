@@ -7,7 +7,8 @@ def draw_overlay(frame, gesture):
         "mute":         (" Mute", (0, 0, 255)), # Red
         "screenshot":   (" Screenshot", (255, 0, 0)), # Blue
         "next_track":   (" Next Track", (128, 0, 128)),  # Purple
-        "previous_track":("Previous Track",(255,165,0))
+        "previous_track":("Previous Track",(255,165,0)),
+        "minimize": (" Minimize", (100, 100, 255)),  # Light Blue
     }
     if gesture in overlays:
         text, color = overlays[gesture]
