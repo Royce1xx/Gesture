@@ -67,6 +67,9 @@ while True:
                     pyautogui.press("nexttrack")
                 elif gesture == "previous_track":
                     pyautogui.press("previoustrack")
+                elif gesture == "minimize":
+                    pyautogui.hotkey("win", "down")
+
 
                 draw_overlay(frame, gesture)
     else:
