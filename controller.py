@@ -18,6 +18,7 @@ cap = cv2.VideoCapture(0)
 gesture_state = None
 last_trigger_time = 0
 cooldown = 1.0
+camera_enabled = True  # Toggle for camera processing
 
 def take_screenshot(frame):
     now = datetime.now().strftime("%Y%m%d_%H%M%S")
@@ -30,49 +31,57 @@ while True:
     if not ret:
         break
 
-    img_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-    result = hands.process(img_rgb)
-    h, w, _ = frame.shape
+    if camera_enabled:
+        img_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+        result = hands.process(img_rgb)
+        h, w, _ = frame.shape
 
-    if result.multi_hand_landmarks:
-        for handLms in result.multi_hand_landmarks:
-            lm_list = []
-            for id, lm in enumerate(handLms.landmark):
-                cx, cy = int(lm.x * w), int(lm.y * h)
-                lm_list.append((cx, cy))
+        if result.multi_hand_landmarks:
+            for handLms in result.multi_hand_landmarks:
+                lm_list = []
+                for id, lm in enumerate(handLms.landmark):
+                    cx, cy = int(lm.x * w), int(lm.y * h)
+                    lm_list.append((cx, cy))
 
-            mp_draw.draw_landmarks(frame, handLms, mp_hands.HAND_CONNECTIONS)
+                mp_draw.draw_landmarks(frame, handLms, mp_hands.HAND_CONNECTIONS)
 
-            gesture = recognize_gesture(lm_list)
-            current_time = time.time()
+                gesture = recognize_gesture(lm_list)
+                current_time = time.time()
 
-            if gesture != gesture_state and (current_time - last_trigger_time) > cooldown:
-                gesture_state = gesture
-                last_trigger_time = current_time
+                if gesture != gesture_state and (current_time - last_trigger_time) > cooldown:
+                    gesture_state = gesture
+                    last_trigger_time = current_time
 
-                if gesture == "volume_up":
-                    pyautogui.press("volumeup")
-                elif gesture == "play_pause":
-                    pyautogui.press("playpause")
-                elif gesture == "mute":
-                    pyautogui.press("volumemute")
-                elif gesture == "screenshot":
-                    take_screenshot(frame)
-                elif gesture == "next_track":
-                    pyautogui.press("nexttrack")
-                elif gesture == "previous_track":
-                    pyautogui.press("previoustrack")
-                elif gesture == "minimize":
-                    pyautogui.hotkey("win", "down")
+                    if gesture == "volume_up":
+                        pyautogui.press("volumeup")
+                    elif gesture == "play_pause":
+                        pyautogui.press("playpause")
+                    elif gesture == "mute":
+                        pyautogui.press("volumemute")
+                    elif gesture == "screenshot":
+                        take_screenshot(frame)
+                    elif gesture == "next_track":
+                        pyautogui.press("nexttrack")
+                    elif gesture == "previous_track":
+                        pyautogui.press("previoustrack")
+                    elif gesture == "minimize":
+                        pyautogui.hotkey("win", "down")
 
-                draw_overlay(frame, gesture)
+                    draw_overlay(frame, gesture)
+        else:
+            gesture_state = None
     else:
-        gesture_state = None
+        cv2.putText(frame, "Camera Paused (Press 'd' to resume)", (30, 60),
+                    cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
 
     cv2.imshow("Gesture Controller", frame)
 
-    if cv2.waitKey(1) & 0xFF == ord('q'):
+    key = cv2.waitKey(1) & 0xFF
+    if key == ord('q'):
         break
+    elif key == ord('d'):
+        camera_enabled = not camera_enabled
+        print("📷 Camera", "enabled" if camera_enabled else "disabled")
 
 cap.release()
 cv2.destroyAllWindows()
